@@ -12,7 +12,7 @@ export interface SiteConfig {
 export const siteConfig: SiteConfig = {
   name: "smallbreeze",
   description: "Monitor social media groups for keywords related to your business",
-  url: "https://keywordalerts.ai",
+  url: "https://smallbreeze.com",
   ogImage: "https://tx.shadcn.com/og.jpg",
   links: {
     twitter: "https://twitter.com/shadcn",
