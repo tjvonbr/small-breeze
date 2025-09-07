@@ -1,11 +1,10 @@
 "use client"
-
-import { useState } from "react";
+  
+import { useActionState } from "react";
 import { newPropertySchema } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -14,62 +13,27 @@ import { Button, buttonVariants } from "./ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { states } from "@/lib/consts";
-import countryList, { getCode } from "country-list";
+import countryList from "country-list";
 import { createListing } from "@/lib/actions/listings";
 
 type FormData = z.infer<typeof newPropertySchema>;
 
-interface NewPropertyFormProps {
-  userId: string;
-}
-
-export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
+export default function NewPropertyForm() {
   const form = useForm<FormData>({
     resolver: zodResolver(newPropertySchema),
   });
 
   const countries = countryList.getNames();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  async function onSubmit(data: FormData) {
-    setIsLoading(true);
-
-    try {
-      setIsLoading(false);
-
-      const formData = new FormData();
-      formData.append("nickname", data.nickname);
-      formData.append("streetAddress", data.streetAddress);
-      formData.append("streetAddress2", data.streetAddress2 ?? "");
-      formData.append("city", data.city);
-      formData.append("state", data.state);
-      formData.append("zip", data.zip);
-      formData.append("country", getCode(data.country) ?? "");
-      formData.append("calendarLink", data.calendarLink ?? "");
-  
-      const result = await createListing(formData, userId);
-
-      return toast.success("Check your email", {
-        description:
-          "We sent you a login link. Be sure to check your spam too.",
-      });
-    } catch (error) {
-      setIsLoading(false);
-      console.error(error);
-      return toast.error("Something went wrong.", {
-        description: "Your sign up request failed. Please try again.",
-      });
-    }
-  }
+  const [, action, pending] = useActionState(createListing, null);
 
   return (
     <div className="mt-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form action={action}>
           <div className="grid gap-2">
             <div className="grid gap-1">
-              <Label className="" htmlFor="firstName">
+              <Label className="" htmlFor="nickname">
                 Property name
               </Label>
               <Input
@@ -78,7 +42,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 autoCapitalize="none"
                 autoComplete="firstName"
                 autoCorrect="off"
-                disabled={isLoading}
+                disabled={pending}
                 {...form.register("nickname")}
               />
               {form.formState.errors?.nickname && (
@@ -97,7 +61,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 autoCapitalize="none"
                 autoComplete="streetAddress"
                 autoCorrect="off"
-                disabled={isLoading}
+                disabled={pending}
                 {...form.register("streetAddress")}
               />
               {form.formState.errors?.streetAddress && (
@@ -116,7 +80,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 autoCapitalize="none"
                 autoComplete="streetAddress"
                 autoCorrect="off"
-                disabled={isLoading}
+                disabled={pending}
                 {...form.register("streetAddress2")}
               />
               {form.formState.errors?.streetAddress2 && (
@@ -132,7 +96,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 type="text"
                 autoCapitalize="none"
                 autoCorrect="off"
-                disabled={isLoading}
+                disabled={pending}
                 {...form.register("city")}
               />
               {form.formState.errors?.city && (
@@ -148,7 +112,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 render={({ field}) => (
                   <FormItem>
                     <FormLabel>State</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a state" />
@@ -160,6 +124,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                         ))}
                       </SelectContent>
                     </Select>
+                    <input type="hidden" name={field.name} value={field.value ?? ""} />
                   </FormItem>
               )} />
             </div>
@@ -170,7 +135,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 type="text"
                 autoCapitalize="none"
                 autoCorrect="off"
-                disabled={isLoading}
+                disabled={pending}
                 {...form.register("zip")}
               />
               {form.formState.errors?.zip && (
@@ -186,7 +151,7 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
-                    <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a country" />
@@ -198,13 +163,14 @@ export default function NewPropertyForm({ userId }: NewPropertyFormProps) {
                         ))}
                       </SelectContent>
                     </Select>
+                    <input type="hidden" name={field.name} value={field.value ?? ""} />
                   </FormItem>
               )} />
             </div>
           </div>
           <div className="mt-4">
-            <Button className={cn(buttonVariants(), "hover:cursor-pointer")} disabled={isLoading}>
-              {isLoading && (
+            <Button className={cn(buttonVariants(), "hover:cursor-pointer")} disabled={pending}>
+              {pending && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
               Save property

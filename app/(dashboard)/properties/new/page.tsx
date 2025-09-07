@@ -17,7 +17,7 @@ export default async function NewPropertyPage() {
         heading="Properties"
         text="Add a new property"
       />
-      <NewPropertyForm userId={session.user.id} />
+      <NewPropertyForm />
     </DashboardShell>
   );
 }

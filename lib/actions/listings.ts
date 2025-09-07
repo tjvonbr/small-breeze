@@ -1,9 +1,19 @@
 "use server"
 
+import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import { newPropertySchema } from "@/lib/validations/auth"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 
-export async function createListing(formData: FormData, userId: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createListing(_: any, formData: FormData) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    return { error: "Unauthorized" }
+  }
+
   const listing = newPropertySchema.parse({
     nickname: formData.get("nickname"),
     streetAddress: formData.get("streetAddress"),
@@ -12,10 +22,7 @@ export async function createListing(formData: FormData, userId: string) {
     state: formData.get("state"),
     zip: formData.get("zip"),
     country: formData.get("country"),
-    userId: formData.get("userId"),
-    calendarLink: formData.get("calendarLink")
   })
-
 
   const newListing = await prisma.listing.create({
     data: {
@@ -26,16 +33,16 @@ export async function createListing(formData: FormData, userId: string) {
       state: listing.state,
       zip: listing.zip,
       country: listing.country,
-      userId: userId,
-      calendarLinks: listing.calendarLink
-        ? {
-            create: {
-              url: String(listing.calendarLink),
-            },
-          }
-        : undefined,
+      userId: session.user.id,
     }
   })
 
-  return newListing
+  if (!newListing) {
+    return { 
+      error: "Failed to create listing" 
+    }
+  }
+
+  revalidatePath("/properties")
+  redirect(`/properties/${newListing.id}`)
 }
