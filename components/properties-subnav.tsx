@@ -9,22 +9,21 @@ interface NavLink {
   href: string
 }
 
-const navLinks: NavLink[] = [
-  { label: "Properties", href: "/properties" },
-]
-
 export function PropertiesSubnav() {
   const pathname = usePathname()
+  const split = pathname.split("/")
+  const propertyId = split[2]
 
-  // Check if we're on a specific property page to show subnav
-  const isPropertyPage = pathname.startsWith("/properties/") && pathname !== "/properties"
-  const propertyId = isPropertyPage ? pathname.split("/")[2] : null
+  const navLinks: NavLink[] = [
+    { label: "Details", href: `/properties/${propertyId ?? ""}` },
+    { label: "Links", href: `/properties/${propertyId ?? ""}/links` },
+  ]
 
   return (
     <div className="mt-4 border-b">
       <nav className="-mb-px flex gap-6">
         {navLinks.map(({ label, href }) => {
-          const isActive = pathname === href || (href === "/properties" && pathname.startsWith("/properties"))
+          const isActive = pathname === href
           return (
             <Link
               key={href}
@@ -41,35 +40,6 @@ export function PropertiesSubnav() {
             </Link>
           )
         })}
-        
-        {isPropertyPage && propertyId && (
-          <>
-            <Link
-              href={`/properties/${propertyId}`}
-              aria-current={pathname === `/properties/${propertyId}` ? "page" : undefined}
-              className={cn(
-                "pb-2 text-sm font-medium transition-colors",
-                pathname === `/properties/${propertyId}`
-                  ? "text-foreground border-b-2 border-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Details
-            </Link>
-            <Link
-              href={`/properties/${propertyId}/links`}
-              aria-current={pathname === `/properties/${propertyId}/links` ? "page" : undefined}
-              className={cn(
-                "pb-2 text-sm font-medium transition-colors",
-                pathname === `/properties/${propertyId}/links`
-                  ? "text-foreground border-b-2 border-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              Links
-            </Link>
-          </>
-        )}
       </nav>
     </div>
   )

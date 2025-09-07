@@ -1,118 +1,26 @@
-'use client';
-
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import { PropertiesSubnav } from "@/components/properties-subnav";
-import { mockListings } from "@/lib/mock-listings";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import firebase from "@/lib/firebase";
+import React from "react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { getListingsByUserId } from "@/lib/listings";
-
-// Unified interface that can handle both Prisma and mock data
-interface UnifiedListing {
-  id: string;
-  nickname: string;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  userId: string;
-  calendarLinks: Array<{ id: string; url: string }>;
-}
 
 function formatUpdatedAt(dateValue: Date | string) {
   const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
   return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 }
 
-export default function PropertiesPage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [listings, setListings] = useState<UnifiedListing[]>([]);
-  const [loading, setLoading] = useState(true);
+export default async function PropertiesPage() {
+  const session = await auth()
 
-  useEffect(() => {
-    const auth = getAuth(firebase);
-    
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      
-      if (user) {
-        try {
-          const userListings = await getListingsByUserId(user.uid);
-          // Convert Prisma listings to unified format
-          const unifiedListings: UnifiedListing[] = userListings.map((listing: any) => ({
-            id: listing.id,
-            nickname: listing.nickname,
-            streetAddress: listing.streetAddress,
-            city: listing.city,
-            state: listing.state,
-            zip: listing.zip,
-            country: listing.country,
-            createdAt: listing.createdAt,
-            updatedAt: listing.updatedAt,
-            userId: listing.userId,
-            calendarLinks: listing.calendarLinks || []
-          }));
-          setListings(unifiedListings);
-        } catch (error) {
-          console.error('Error fetching listings:', error);
-          // Fallback to mock data if there's an error
-          setListings(mockListings);
-        }
-      } else {
-        // No user signed in, show empty state or redirect
-        setListings([]);
-      }
-      
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    return (
-      <DashboardShell>
-        <DashboardHeader
-          heading="Properties"
-          text="Manage your properties and their settings"
-        />
-        <PropertiesSubnav />
-        <Card className="mt-6">
-          <CardContent>
-            <div className="flex items-center justify-center h-32">
-              <div className="text-lg">Loading...</div>
-            </div>
-          </CardContent>
-        </Card>
-      </DashboardShell>
-    );
+  if (!session?.user?.id) {
+    redirect("/sign-in")
   }
 
-  if (!user) {
-    return (
-      <DashboardShell>
-        <DashboardHeader
-          heading="Properties"
-          text="Manage your properties and their settings"
-        />
-        <PropertiesSubnav />
-        <Card className="mt-6">
-          <CardContent>
-            <div className="flex items-center justify-center h-32">
-              <div className="text-lg">Please sign in to view your properties</div>
-            </div>
-          </CardContent>
-        </Card>
-      </DashboardShell>
-    );
-  }
+  const listings = await getListingsByUserId(session.user.id)
 
   return (
     <DashboardShell>

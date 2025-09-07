@@ -2,18 +2,30 @@ import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import { PropertiesSubnav } from "@/components/properties-subnav";
-import { mockListings } from "@/lib/mock-listings";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import React from "react";
+import { auth } from "@/auth";
+import { getListingById } from "@/lib/listings";
 
 interface PropertyPageProps {
   params: { id: string }
 }
 
-export default function PropertyPage({ params }: PropertyPageProps) {
-  const listing = mockListings.find((l) => l.id === params.id)
-  if (!listing) return notFound()
+export default async function PropertyPage({ params }: PropertyPageProps) {
+  const session = await auth()
+
+  if (!session?.user?.id) {
+    redirect("/sign-in")
+  }
+
+  const { id } = await params
+
+  const listing = await getListingById(id)
+
+  if (!listing) {
+    redirect("/properties")
+  }
 
   const address = `${listing.streetAddress}, ${listing.city}, ${listing.state} ${listing.zip}`
 
