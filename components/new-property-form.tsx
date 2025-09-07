@@ -33,7 +33,7 @@ export default function NewPropertyForm() {
         <form action={action}>
           <div className="grid gap-2">
             <div className="grid gap-1">
-              <Label className="" htmlFor="nickname">
+              <Label htmlFor="nickname">
                 Property name
               </Label>
               <Input

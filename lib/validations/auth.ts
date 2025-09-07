@@ -19,3 +19,8 @@ export const newPropertySchema = z.object({
   zip: z.string().min(1),
   country: z.string().min(1),
 });
+
+export const newCalendarLinkSchema = z.object({
+  url: z.string().min(1),
+  listingId: z.string().min(1),
+});
