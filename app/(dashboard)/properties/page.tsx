@@ -1,12 +1,14 @@
 import { DashboardHeader } from "@/components/dashboard-header";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { Card, CardContent } from "@/components/ui/card";
-import { PropertiesSubnav } from "@/components/properties-subnav";
 import Link from "next/link";
 import React from "react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getListingsByUserId } from "@/lib/listings";
+import { buttonVariants } from "@/components/ui/button";
+import { Icons } from "@/components/icons";
+import { cn } from "@/lib/utils";
 
 function formatUpdatedAt(dateValue: Date | string) {
   const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
@@ -27,8 +29,12 @@ export default async function PropertiesPage() {
       <DashboardHeader
         heading="Properties"
         text="Manage your properties and their settings"
-      />
-      <PropertiesSubnav />
+      >
+        <Link href="/properties/new" className={cn(buttonVariants(), "hover:cursor-pointer")}>
+          <Icons.plus className="h-4 w-4" />
+          <p>Add new listing</p>
+        </Link>
+      </DashboardHeader>
       <Card className="mt-6">
         <CardContent>
           <div className="overflow-x-auto">

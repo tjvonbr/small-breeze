@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { fetchAllICSFiles } from "@/lib/ics-fetcher";
 import { type CalendarEvent as CalendarEventType } from "@/lib/ics-parser";
 import React from "react";
-import Link from "next/link";
 import { ListingWithCalendarLinks } from "@/types/listings";
 
 export default function ListingLinksPageOps({ listing }: { listing: ListingWithCalendarLinks }) {
@@ -48,14 +47,7 @@ export default function ListingLinksPageOps({ listing }: { listing: ListingWithC
 
   return (
     <DashboardShell>
-      <DashboardHeader heading={listing.nickname} text="Manage calendar link integrations for this property">
-        <Link 
-          href={`/properties/${listing.id}`}
-          className="text-sm text-primary hover:underline"
-        >
-          ← Back to Property
-        </Link>
-      </DashboardHeader>
+      <DashboardHeader heading={listing.nickname} text="Manage calendar link integrations for this property" />
       <PropertiesSubnav />
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="grid gap-6">

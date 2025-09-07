@@ -73,6 +73,7 @@ model Listing {
   id        String   @id @default(uuid())
   nickname  String
   streetAddress   String
+  streetAddress2  String?
   city      String
   state     String
   zip   String
