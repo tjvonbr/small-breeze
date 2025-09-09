@@ -17,7 +17,5 @@ export default async function PropertyLinksPage({ params }: PropertyLinksPagePro
     redirect("/properties")
   }
 
-  return (
-    <ListingLinksPageOps listing={listing} />
-  )
+  return <ListingLinksPageOps listing={listing} />
 } 

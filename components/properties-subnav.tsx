@@ -15,8 +15,9 @@ export function PropertiesSubnav() {
   const propertyId = split[2]
 
   const navLinks: NavLink[] = [
-    { label: "Details", href: `/properties/${propertyId ?? ""}` },
-    { label: "Links", href: `/properties/${propertyId ?? ""}/links` },
+    { label: "Details", href: `/properties/${propertyId}` },
+    { label: "Calendar", href: `/properties/${propertyId}/calendar` },
+    { label: "Links", href: `/properties/${propertyId}/links` },
   ]
 
   return (

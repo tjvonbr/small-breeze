@@ -17,15 +17,13 @@ export default function CalendarView({ events }: CalendarViewProps ) {
   const todaysEvents = events.filter(event => isSameDay(event.start, new Date()))
 
   const getEventsForDate = (date: Date) => {
-    return events.filter(event => {
-      const eventDate = new Date(event.start);
-      return (
-        eventDate.getDate() === date.getDate() &&
-        eventDate.getMonth() === date.getMonth() &&
-        eventDate.getFullYear() === date.getFullYear()
-      );
-    });
-  };
+    const startOfDay = new Date(date)
+    startOfDay.setHours(0, 0, 0, 0)
+    const endOfDay = new Date(date)
+    endOfDay.setHours(23, 59, 59, 999)
+
+    return events.filter((event) => event.start <= endOfDay && event.end >= startOfDay)
+  }
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -40,12 +38,6 @@ export default function CalendarView({ events }: CalendarViewProps ) {
         className="rounded-md [&_.rdp-table]:border-separate [&_.rdp-table]:border-spacing-2 [&_.rdp-tbody_td]:p-1"
         components={{
           Day: (props) => <DayCell day={props.day.date} events={events} selectDate={setSelectedDate} />
-        }}
-        modifiers={{
-          hasEvent: (date) => getEventsForDate(date).length > 0,
-        }}
-        modifiersStyles={{
-          hasEvent: { backgroundColor: '#3b82f6', color: 'white' },
         }}
       />
 

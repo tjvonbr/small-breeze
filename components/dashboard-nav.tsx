@@ -5,6 +5,7 @@ import { cn } from "../lib/utils"
 import Link from "next/link"
 import { Icons } from "./icons"
 import { SidebarNavItem } from "@/config/dashboard"
+import { UserDropdown } from "./user-dropdown"
 
 interface DashboardNavProps {
   items?: SidebarNavItem[]
@@ -40,6 +41,9 @@ export function DashboardNav({ items }: DashboardNavProps) {
           )
         })}
       </nav>
+      <div className="mt-auto pt-4">
+        <UserDropdown />
+      </div>
     </div>
   )
 }

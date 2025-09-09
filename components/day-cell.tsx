@@ -1,5 +1,5 @@
 import { CalendarEvent } from "@/lib/ics-parser"
-import { isSameDay } from "@/lib/utils"
+import BookingBar from "./booking-bar"
 
 interface DayCellProps {
   day: Date
@@ -10,22 +10,23 @@ interface DayCellProps {
 export default function DayCell({ day, events, selectDate }: DayCellProps) {
   const date = new Date(day)
 
-  const checkOuts = events.filter((event) => isSameDay(event.end, date))
+  const startOfDay = new Date(date)
+  startOfDay.setHours(0, 0, 0, 0)
+  const endOfDay = new Date(date)
+  endOfDay.setHours(23, 59, 59, 999)
+
+  const eventsForDay = events.filter((event) => {
+    return event.start <= endOfDay && event.end >= startOfDay
+  })
 
   return (
     <div 
-      className="relative w-full aspect-square p-2 hover:bg-muted/50 cursor-pointer rounded-md" 
+      className="relative w-full aspect-square p-2 hover:bg-muted/50 cursor-pointer rounded-md border border-border/50" 
       onClick={() => selectDate(day)}
     >
       <p className="text-sm absolute top-2 right-2">{date.getDate()}</p>
-      {checkOuts.map((event, index) => (
-        <div 
-          key={event.id} 
-          className="absolute left-1 bottom-1 inline-flex items-center px-1 py-0.5 text-[10px] font-medium bg-blue-100 text-blue-800 rounded-sm border border-blue-200 max-w-[calc(100%-0.5rem)] truncate"
-          style={{ bottom: `${0.25 + index * 1}rem` }}
-        >
-          {event.id}
-        </div>
+      {eventsForDay.map((event) => (
+        <BookingBar key={event.id} event={event} currentDate={date} />
       ))}
     </div>
   )

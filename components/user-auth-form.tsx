@@ -50,7 +50,7 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
       const signInResult = await signIn("resend", {
         email: data.email,
         redirect: false,
-        callbackUrl: searchParams?.get("from") || "/dashboard",
+        callbackUrl: searchParams?.get("from") || "/properties",
       });
 
       setIsLoading(false);
