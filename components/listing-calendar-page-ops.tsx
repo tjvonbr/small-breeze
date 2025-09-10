@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 import { ListingWithCalendarLinks } from "@/types/listings"
 import { DashboardHeader } from "./dashboard-header"

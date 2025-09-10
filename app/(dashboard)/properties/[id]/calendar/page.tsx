@@ -1,6 +1,6 @@
 import ListingCalendarPageOps from "@/components/listing-calendar-page-ops"
 import { getCalendarLinksByListingId } from "@/lib/calendar-links"
-import { parseFile } from "@/lib/ics-parser"
+import { parseFiles } from "@/lib/ics-parser"
 import { getListingById } from "@/lib/listings"
 import { redirect } from "next/navigation"
 
@@ -13,8 +13,7 @@ export default async function PropertyCalendarPage({ params }: PropertyCalendarP
 
   const listing = await getListingById(id)
   const calendarLinks = await getCalendarLinksByListingId(id)
-  const events = await parseFile(calendarLinks[0].url)
-  console.log("events: ", events)
+  const events = await parseFiles(calendarLinks)
 
   if (!listing) {
     redirect("/properties")

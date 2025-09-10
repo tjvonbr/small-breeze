@@ -1,3 +1,4 @@
+import { CalendarLink, Listing } from '@/generated/prisma';
 import ical from 'node-ical';
 
 export interface CalendarEvent {
@@ -8,6 +9,16 @@ export interface CalendarEvent {
   end: Date;
   location?: string;
   allDay: boolean;
+  listing: {
+    id: string;
+    nickname: string;
+    streetAddress: string;
+    streetAddress2?: string | null;
+    city: string;
+    state: string;
+    zip: string;
+    country: string;
+  };
 }
 
 interface ICalEvent {
@@ -21,14 +32,23 @@ interface ICalEvent {
   datetype?: string;
 }
 
-export async function parseFile(filePath: string): Promise<CalendarEvent[]> {
-  const rawEvents = await ical.async.fromURL(filePath);
-  const parsedEvents = parseEvents(rawEvents);
+type CalendarLinkWithListing = CalendarLink & {
+  listing: Listing;
+};
+
+export async function parseFiles(calendarLinks: CalendarLinkWithListing[]): Promise<CalendarEvent[]> {
+  const allEvents: CalendarEvent[] = [];
   
-  return parsedEvents
+  for (const link of calendarLinks) {
+    const rawEvents = await ical.async.fromURL(link.url);
+    const parsedEvents = parseEvents(rawEvents, link.listing);
+    allEvents.push(...parsedEvents);
+  }
+  
+  return allEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
 }
 
-function parseEvents(events: Record<string, ICalEvent>): CalendarEvent[] {
+function parseEvents(events: Record<string, ICalEvent>, listing: Listing): CalendarEvent[] {
   const calendarEvents: CalendarEvent[] = [];
   
   for (const key in events) {
@@ -45,12 +65,22 @@ function parseEvents(events: Record<string, ICalEvent>): CalendarEvent[] {
         location: event.location,
         allDay: event.datetype === 'date' || !!(event.start && event.end && 
           event.start.getHours() === 0 && event.end.getHours() === 0 &&
-          event.start.getMinutes() === 0 && event.end.getMinutes() === 0)
+          event.start.getMinutes() === 0 && event.end.getMinutes() === 0),
+        listing: {
+          id: listing.id,
+          nickname: listing.nickname,
+          streetAddress: listing.streetAddress,
+          streetAddress2: listing.streetAddress2,
+          city: listing.city,
+          state: listing.state,
+          zip: listing.zip,
+          country: listing.country
+        }
       };
       
       calendarEvents.push(calendarEvent);
     }
   }
   
-  return calendarEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
+  return calendarEvents;
 }

@@ -1,13 +1,15 @@
 import { CalendarEvent } from "@/lib/ics-parser"
 import BookingBar from "./booking-bar"
+import { isSameDay } from "@/lib/utils"
 
 interface DayCellProps {
   day: Date
   events: CalendarEvent[]
   selectDate: (date: Date) => void
+  showOnlyCheckoutDays?: boolean
 }
 
-export default function DayCell({ day, events, selectDate }: DayCellProps) {
+export default function DayCell({ day, events, selectDate, showOnlyCheckoutDays = false }: DayCellProps) {
   const date = new Date(day)
 
   const startOfDay = new Date(date)
@@ -16,7 +18,14 @@ export default function DayCell({ day, events, selectDate }: DayCellProps) {
   endOfDay.setHours(23, 59, 59, 999)
 
   const eventsForDay = events.filter((event) => {
-    return event.start <= endOfDay && event.end >= startOfDay
+    const isEventOnDay = event.start <= endOfDay && event.end >= startOfDay
+    
+    if (showOnlyCheckoutDays) {
+      // Only show events that have a checkout (end date) on this day
+      return isEventOnDay && isSameDay(event.end, date)
+    }
+    
+    return isEventOnDay
   })
 
   return (
@@ -26,7 +35,7 @@ export default function DayCell({ day, events, selectDate }: DayCellProps) {
     >
       <p className="text-sm absolute top-2 right-2">{date.getDate()}</p>
       {eventsForDay.map((event) => (
-        <BookingBar key={event.id} event={event} currentDate={date} />
+        <BookingBar key={event.id} event={event} currentDate={date} isCheckoutOnly={showOnlyCheckoutDays} />
       ))}
     </div>
   )

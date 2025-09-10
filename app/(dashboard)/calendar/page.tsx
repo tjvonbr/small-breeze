@@ -1,10 +1,16 @@
+import { auth } from '@/auth';
 import CalendarView from '@/components/calendar-view';
-import { fetchAllICSFiles } from '@/lib/ics-fetcher';
+import { getCalendarLinksByUserId } from '@/lib/calendar-links';
+import { redirect } from 'next/navigation';
 
-const events = await fetchAllICSFiles([
-  "https://www.airbnb.com/calendar/ical/1439625607774765542.ics?s=cc888b862fcae55c27cdd5ae79e70232"
-])
+export default async function CalendarPage() {
+  const session = await auth()
 
-export default function Home() {
-  return <CalendarView events={events} />;
+  if (!session?.user?.id) {
+    redirect("/sign-in")
+  }
+
+  const events = await getCalendarLinksByUserId(session.user.id)
+
+  return <CalendarView events={events} showOnlyCheckoutDays={true} />;
 }
