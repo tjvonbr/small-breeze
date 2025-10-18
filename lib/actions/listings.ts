@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
-import { newPropertySchema } from "@/lib/validations/auth"
+import { newPropertySchema } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 

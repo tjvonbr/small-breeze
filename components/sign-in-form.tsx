@@ -2,46 +2,44 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
 import { cn } from "@/lib/utils";
-import { loginAuthSchema } from "@/lib/validations/auth";
+import { loginSchema } from "@/lib/validations";
 import { Form } from "./ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSearchParams } from "next/navigation";
 import React from "react";
-import { signIn } from "next-auth/react"
 import z from "zod";
 import { buttonVariants } from "./ui/button";
 import { Icons } from "./icons";
 import { toast } from "sonner";
+import authClient from "@/lib/auth-client";
+import Link from "next/link";
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
-type FormData = z.infer<typeof loginAuthSchema>;
+type FormData = z.infer<typeof loginSchema>;
 
-export function LoginForm({ className, ...props }: UserAuthFormProps) {
+export function SignInForm({ className, ...props }: UserAuthFormProps) {
   const form = useForm<FormData>({
-    resolver: zodResolver(loginAuthSchema),
+    resolver: zodResolver(loginSchema),
   });
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false);
-  const searchParams = useSearchParams();
 
   async function onSubmit(data: FormData) {
     setIsLoading(true);
 
     try {
-      const signInResult = await signIn("resend", {
+      const { error } = await authClient.signIn.email({
         email: data.email.toLowerCase().trim(),
-        redirect: false,
-        callbackUrl: searchParams?.get("from") || "/calendar",
+        password: data.password,
+        callbackURL: "/"
       });
 
       setIsLoading(false);
 
-      if (!signInResult?.ok) {
+      if (error) {
+        console.log(error);
         return toast.error("Something went wrong.", {
           description: "Your sign in request failed. Please try again.",
         });
@@ -64,19 +62,18 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
     <div className={cn("grid gap-6", className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="grid gap-2">
+          <div className="grid gap-4">
             <div className="grid gap-1">
-              <Label className="sr-only" htmlFor="email">
+              <Label htmlFor="email">
                 Email
               </Label>
               <Input
                 id="email"
-                placeholder="name@example.com"
                 type="email"
                 autoCapitalize="none"
                 autoComplete="email"
                 autoCorrect="off"
-                disabled={isLoading || isGoogleLoading}
+                disabled={isLoading}
                 {...form.register("email")}
               />
               {form.formState.errors?.email && (
@@ -85,39 +82,39 @@ export function LoginForm({ className, ...props }: UserAuthFormProps) {
                 </p>
               )}
             </div>
+            <div className="grid gap-1">
+              <Label htmlFor="password">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                autoCapitalize="none"
+                autoComplete="password"
+                autoCorrect="off"
+                disabled={isLoading}
+                {...form.register("password")}
+              />
+              {form.formState.errors?.password && (
+                <p className="px-1 text-xs text-red-600">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
+              <Link 
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:text-brand hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <button className={cn(buttonVariants())} disabled={isLoading}>
               {isLoading && (
                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Sign In with Email
+              Sign in
             </button>
           </div>
         </form>
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-        <button
-          type="button"
-          className={cn(buttonVariants({ variant: "outline" }))}
-          onClick={() => {
-            setIsGoogleLoading(true);
-            signIn("google");
-          }}
-          disabled={isLoading || isGoogleLoading}
-        >
-          {isGoogleLoading ? (
-            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            "Google"
-          )}
-        </button>
       </Form>
     </div>
   );

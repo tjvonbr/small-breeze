@@ -1,12 +1,16 @@
-import { auth } from '@/auth';
+
 import CalendarView from '@/components/calendar-view';
+import { auth } from '@/lib/auth';
 import { getCalendarLinksByUserId } from '@/lib/calendar-links';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 export default async function CalendarPage() {
-  const session = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
 
-  if (!session?.user?.id) {
+  if (!session) {
     redirect("/sign-in")
   }
 

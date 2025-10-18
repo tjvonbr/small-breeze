@@ -1,15 +1,25 @@
 "use server"
 
-import { auth } from "@/auth"
-import { prisma } from "../prisma"
-import { newCalendarLinkSchema } from "../validations/auth"
+import db from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { headers } from "next/headers"
+import { redirect } from "next/navigation"
+import { auth } from "../auth"
+import { newCalendarLinkSchema } from "../validations"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createCalendarLink(_: any, formData: FormData) {
-  const session = await auth()
 
-  if (!session?.user?.id) {
+  return
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
+  
+  if (session) {
+    redirect("/properties");
+  }
+
+  if (!session) {
     return { error: "Unauthorized" }
   }
 
@@ -18,7 +28,7 @@ export async function createCalendarLink(_: any, formData: FormData) {
     listingId: formData.get("listingId"),
   })
 
-  const newCalendarLink = await prisma.calendarLink.create({
+  const newCalendarLink = await db.calendarLink.create({
     data: {
       url: calendarLink.url,
       listingId: calendarLink.listingId,

@@ -3,12 +3,13 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import React from "react";
-import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getListingsByUserId } from "@/lib/listings";
 import { buttonVariants } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 function formatUpdatedAt(dateValue: Date | string) {
   const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
@@ -16,9 +17,11 @@ function formatUpdatedAt(dateValue: Date | string) {
 }
 
 export default async function PropertiesPage() {
-  const session = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
 
-  if (!session?.user?.id) {
+  if (!session) {
     redirect("/sign-in")
   }
 

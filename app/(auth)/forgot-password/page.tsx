@@ -1,17 +1,11 @@
+import ForgotPasswordForm from "@/components/forgot-password-form";
 import { Icons } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { SignInForm } from "@/components/sign-in-form";
 
-export const metadata: Metadata = {
-  title: "Sign-in",
-  description: "Sign-in to your account",
-};
-
-export default async function LoginPage() {
+export default function ForgotPasswordPage() {
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center">
       <Link
@@ -30,24 +24,16 @@ export default async function LoginPage() {
         <div className="flex flex-col space-y-2 text-center">
           <Icons.logo className="mx-auto h-6 w-6" />
           <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back
+            Forgot your password?
           </h1>
           <p className="text-sm text-muted-foreground">
-            Enter your email and passwordto sign in to your account
+            Enter your email and we&apos;ll send you a link to reset it.
           </p>
         </div>
         <Suspense>
-          <SignInForm />
+          <ForgotPasswordForm />
         </Suspense>
-        <p className="px-8 text-center text-sm text-muted-foreground">
-          <Link
-            href="/sign-up"
-            className="hover:text-brand underline underline-offset-4"
-          >
-            Don&apos;t have an account? Sign up
-          </Link>
-        </p>
       </div>
     </div>
-  );
+  )
 }

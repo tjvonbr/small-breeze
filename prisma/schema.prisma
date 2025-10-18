@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,47 +9,51 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String   @unique
-  emailVerified DateTime?
-  sessions  Session[]
-  accounts  Account[]
-  listings    Listing[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String    @id @default(uuid())
+  firstName     String
+  lastName      String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  listings      Listing[]
+  sessions      Session[]
 
   @@map("users")
 }
 
 model Account {
-  userId            String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
- 
-  @@id([provider, providerAccountId])
+  id                    String    @id @default(uuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  expiresAt             DateTime?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
   @@map("accounts")
 }
 
 model Session {
+  id           String   @id @default(uuid())
   sessionToken String   @unique
   userId       String
-  expires      DateTime
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ipAddress    String?
+  userAgent    String?
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("sessions")
 }
@@ -64,25 +62,25 @@ model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@id([identifier, token])
   @@map("verification_tokens")
 }
 
 model Listing {
-  id        String   @id @default(uuid())
-  nickname  String
-  streetAddress   String
-  streetAddress2  String?
-  city      String
-  state     String
-  zip   String
-  country   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  calendarLinks CalendarLink[]
+  id             String         @id @default(uuid())
+  nickname       String
+  streetAddress  String
+  streetAddress2 String?
+  city           String
+  state          String
+  zip            String
+  country        String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  userId         String
+  calendarLinks  CalendarLink[]
+  user           User           @relation(fields: [userId], references: [id])
 
   @@map("listings")
 }
@@ -91,9 +89,20 @@ model CalendarLink {
   id        String   @id @default(uuid())
   url       String
   listingId String
-  listing   Listing  @relation(fields: [listingId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  listing   Listing  @relation(fields: [listingId], references: [id])
 
   @@map("calendar_links")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
 }

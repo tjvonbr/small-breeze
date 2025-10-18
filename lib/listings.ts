@@ -1,8 +1,8 @@
-import { prisma } from "./prisma";
+import db from "./prisma";
 import { ListingWithCalendarLinks } from "@/types/listings";
 
 export async function getListingById(id: string): Promise<ListingWithCalendarLinks | null> {
-  const listing = await prisma.listing.findUnique({
+  const listing = await db.listing.findUnique({
     where: { id },
     include: { calendarLinks: true }
   })
@@ -11,7 +11,7 @@ export async function getListingById(id: string): Promise<ListingWithCalendarLin
 }
 
 export async function getListingsByUserId(userId: string): Promise<ListingWithCalendarLinks[]> {
-  const listings = await prisma.listing.findMany({
+  const listings = await db.listing.findMany({
     where: {
       userId: userId
     },

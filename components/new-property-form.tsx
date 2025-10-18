@@ -1,7 +1,7 @@
 "use client"
   
 import { useActionState } from "react";
-import { newPropertySchema } from "@/lib/validations/auth";
+import { newPropertySchema } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

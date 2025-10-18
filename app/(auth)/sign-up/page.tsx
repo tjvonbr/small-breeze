@@ -2,7 +2,7 @@ import Link from "next/link"
 import { cn } from "@//lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
-import { UserAuthForm } from "@/components/user-auth-form"
+import SignUpForm from "@/components/sign-up-form"
 import { Suspense } from "react"
 
 export const metadata = {
@@ -31,7 +31,7 @@ export default async function RegisterPage() {
             "absolute right-4 top-4 md:right-8 md:top-8"
           )}
         >
-          Login
+          Sign in
         </Link>
       </div>
       <div className="lg:p-8">
@@ -46,7 +46,7 @@ export default async function RegisterPage() {
             </p>
           </div>
           <Suspense>
-            <UserAuthForm />
+            <SignUpForm />
           </Suspense>
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{" "}
