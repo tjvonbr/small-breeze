@@ -41,7 +41,7 @@ export function DashboardNav({ items }: DashboardNavProps) {
           )
         })}
       </nav>
-      <div className="mt-auto pt-4">
+      <div className="mb-4 mt-auto">
         <UserDropdown />
       </div>
     </div>

@@ -1,7 +1,5 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,35 +9,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User, Settings, LogOut } from "lucide-react"
+import authClient from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
 
 export function UserDropdown() {
-  const { data: session } = useSession()
+  const { data: session } = authClient.useSession()
+  const router = useRouter()
 
-  if (!session?.user) {
-    return null
+  async function handleSignOut() {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/sign-in")
+        },
+      },
+    });
   }
-
-  const handleSignOut = () => {
-    signOut({ callbackUrl: "/sign-in" })
-  }
-
-  const displayName = session.user.name || session.user.email || "User"
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="group flex items-center rounded-md mx-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground h-auto"
-        >
-          <span className="truncate">{displayName}</span>
-        </Button>
+        <button className="w-full px-3">
+          <span className="group flex items-center rounded-md pl-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
+            <span className="truncate">{session?.user?.email || ""}</span>
+          </span>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="start" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col">
             <p className="text-xs leading-none text-muted-foreground">
-              {session.user.email}
+              {session?.user?.email || ""}
             </p>
           </div>
         </DropdownMenuLabel>
