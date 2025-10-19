@@ -10,8 +10,6 @@ export default async function CalendarPage() {
     headers: await headers()
   })
 
-  console.log(session)
-
   if (!session) {
     redirect("/sign-in")
   }

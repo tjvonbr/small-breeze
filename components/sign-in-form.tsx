@@ -39,16 +39,10 @@ export function SignInForm({ className, ...props }: UserAuthFormProps) {
       setIsLoading(false);
 
       if (error) {
-        console.log(error);
         return toast.error("Something went wrong.", {
           description: "Your sign in request failed. Please try again.",
         });
       }
-
-      return toast.success("Check your email", {
-        description:
-          "We sent you a login link. Be sure to check your spam too.",
-      });
     } catch (error) {
       setIsLoading(false);
       console.error(error);

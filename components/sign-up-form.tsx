@@ -29,7 +29,7 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true);
 
     try {
-      const { error, data: signUpData } = await authClient.signUp.email({
+      const { error } = await authClient.signUp.email({
         email: data.email.toLowerCase().trim(),
         password: data.password,
         callbackURL: "/",
@@ -37,9 +37,6 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
         lastName: data.lastName,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any)
-
-      console.log('data: ', signUpData);
-      console.log('error: ', error)
 
       setIsLoading(false);
 
