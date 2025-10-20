@@ -1,16 +1,20 @@
 "use server"
 
-import { auth } from "@/auth"
-import { prisma } from "@/lib/prisma"
-import { newPropertySchema } from "@/lib/auth"
+
+import db from "@/lib/prisma"
+import { auth } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { newPropertySchema } from "../validations"
+import { headers } from "next/headers"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createListing(_: any, formData: FormData) {
-  const session = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
 
-  if (!session?.user?.id) {
+  if (!session) {
     return { error: "Unauthorized" }
   }
 
@@ -24,7 +28,7 @@ export async function createListing(_: any, formData: FormData) {
     country: formData.get("country"),
   })
 
-  const newListing = await prisma.listing.create({
+  const newListing = await db.listing.create({
     data: {
       nickname: listing.nickname,
       streetAddress: listing.streetAddress,

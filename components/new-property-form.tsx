@@ -1,7 +1,6 @@
 "use client"
   
 import { useActionState } from "react";
-import { newPropertySchema } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { states } from "@/lib/consts";
 import countryList from "country-list";
 import { createListing } from "@/lib/actions/listings";
+import { newPropertySchema } from "@/lib/validations";
 
 type FormData = z.infer<typeof newPropertySchema>;
 

@@ -5,11 +5,10 @@ import Link from "next/link";
 import React from "react";
 import { redirect } from "next/navigation";
 import { getListingsByUserId } from "@/lib/listings";
-import { buttonVariants } from "@/components/ui/button";
-import { Icons } from "@/components/icons";
-import { cn } from "@/lib/utils";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
+import EmptyProperties from "@/components/empty-properties";
+import AddListingButton from "@/components/add-listing-button";
 
 function formatUpdatedAt(dateValue: Date | string) {
   const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
@@ -33,19 +32,16 @@ export default async function PropertiesPage() {
         heading="Properties"
         text="Manage your properties and their settings"
       >
-        <Link href="/properties/new" className={cn(buttonVariants(), "hover:cursor-pointer")}>
-          <Icons.plus className="h-4 w-4" />
-          <p>Add new listing</p>
-        </Link>
+        {listings.length > 0 && <AddListingButton />}
       </DashboardHeader>
-      <Card className="mt-6">
-        <CardContent>
-          <div className="overflow-x-auto">
-            {listings.length === 0 ? (
-              <div className="flex items-center justify-center h-32">
-                <div className="text-lg text-muted-foreground">No properties found. Create your first property to get started.</div>
-              </div>
-            ) : (
+      {listings.length === 0 ? (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <EmptyProperties />
+        </div>
+      ) : (
+        <Card className="mt-6">
+          <CardContent>
+            <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="text-muted-foreground">
                   <tr className="border-b">
@@ -76,10 +72,10 @@ export default async function PropertiesPage() {
                   })}
                 </tbody>
               </table>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </DashboardShell>
   );
 }

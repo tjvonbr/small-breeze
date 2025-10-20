@@ -15,6 +15,8 @@ import { useRouter } from "next/navigation"
 export function UserDropdown() {
   const { data: session } = authClient.useSession()
   const router = useRouter()
+  
+  const user = session?.user as { firstName?: string; lastName?: string; email?: string } | undefined
 
   async function handleSignOut() {
     await authClient.signOut({
@@ -31,7 +33,7 @@ export function UserDropdown() {
       <DropdownMenuTrigger asChild>
         <button className="w-full px-3">
           <span className="group flex items-center rounded-md pl-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground">
-            <span className="truncate">{session?.user?.email || ""}</span>
+            <span className="truncate">{user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email || ""}</span>
           </span>
         </button>
       </DropdownMenuTrigger>
@@ -39,7 +41,7 @@ export function UserDropdown() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col">
             <p className="text-xs leading-none text-muted-foreground">
-              {session?.user?.email || ""}
+              {user?.email || ""}
             </p>
           </div>
         </DropdownMenuLabel>
