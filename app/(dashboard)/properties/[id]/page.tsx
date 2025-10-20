@@ -5,17 +5,20 @@ import { PropertiesSubnav } from "@/components/properties-subnav";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import React from "react";
-import { auth } from "@/auth";
 import { getListingById } from "@/lib/listings";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 interface PropertyPageProps {
   params: { id: string }
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {
-  const session = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers()
+  })
 
-  if (!session?.user?.id) {
+  if (!session) {
     redirect("/sign-in")
   }
 

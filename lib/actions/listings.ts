@@ -26,6 +26,7 @@ export async function createListing(_: any, formData: FormData) {
     state: formData.get("state"),
     zip: formData.get("zip"),
     country: formData.get("country"),
+    iCalUrl: formData.get("iCalUrl"),
   })
 
   const newListing = await db.listing.create({
@@ -38,6 +39,13 @@ export async function createListing(_: any, formData: FormData) {
       zip: listing.zip,
       country: listing.country,
       userId: session.user.id,
+      ...(listing.iCalUrl && {
+        calendarLinks: {
+          create: {
+            url: listing.iCalUrl,
+          }
+        }
+      })
     }
   })
 

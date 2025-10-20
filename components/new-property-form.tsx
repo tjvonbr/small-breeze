@@ -167,6 +167,22 @@ export default function NewPropertyForm() {
                   </FormItem>
               )} />
             </div>
+            <div className="grid gap-1">
+              <Label htmlFor="iCalLink">iCal URL</Label>
+              <Input
+                id="iCalUrl"
+                type="text"
+                autoCapitalize="none"
+                autoCorrect="off"
+                disabled={pending}
+                {...form.register("iCalUrl")}
+              />
+              {form.formState.errors?.iCalUrl && (
+                <p className="px-1 text-xs text-red-600">
+                  {form.formState.errors.iCalUrl.message}
+                </p>
+              )}
+            </div>
           </div>
           <div className="mt-4">
             <Button className={cn(buttonVariants(), "hover:cursor-pointer")} disabled={pending}>

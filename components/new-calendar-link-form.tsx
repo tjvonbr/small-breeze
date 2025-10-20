@@ -1,7 +1,6 @@
 "use client"
 
 import { createCalendarLink } from "@/lib/actions/calendar-links";
-import { newCalendarLinkSchema } from "@/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useActionState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,6 +11,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Icons } from "./icons";
 import { cn } from "@/lib/utils";
+import { newCalendarLinkSchema } from "@/lib/validations";
 
 interface NewCalendarLinkFormProps {
   listingId: string;

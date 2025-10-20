@@ -25,6 +25,7 @@ export const newPropertySchema = z.object({
   state: z.string().min(1),
   zip: z.string().min(1),
   country: z.string().min(1),
+  iCalUrl: z.string().optional(),
 });
 
 export const forgotPasswordSchema = z.object({
