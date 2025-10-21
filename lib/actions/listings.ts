@@ -38,7 +38,7 @@ export async function createListing(_: any, formData: FormData) {
       state: listing.state,
       zip: listing.zip,
       country: listing.country,
-      userId: session.user.id,
+      teamId: session.user.id,
       ...(listing.iCalUrl && {
         calendarLinks: {
           create: {

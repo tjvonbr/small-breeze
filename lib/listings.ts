@@ -10,10 +10,10 @@ export async function getListingById(id: string): Promise<ListingWithCalendarLin
   return listing
 }
 
-export async function getListingsByUserId(userId: string): Promise<ListingWithCalendarLinks[]> {
+export async function getListingsByUserId(teamId: string): Promise<ListingWithCalendarLinks[]> {
   const listings = await db.listing.findMany({
     where: {
-      userId: userId
+      teamId: teamId
     },
     include: {
       calendarLinks: true
