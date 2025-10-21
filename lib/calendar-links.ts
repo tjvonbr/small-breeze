@@ -11,8 +11,8 @@ export async function getCalendarLinksByListingId(listingId: string) {
   return calendarLinks
 }
 
-export async function getCalendarLinksByUserId(userId: string) {
-  const listings = await getListingsByUserId(userId)
+export async function getCalendarLinksByUserId(teamId: string) {
+  const listings = await getListingsByUserId(teamId)
 
   const calendarLinks = await db.calendarLink.findMany({
     where: { listingId: { in: listings.map(listing => listing.id) } }, include: { listing: true }

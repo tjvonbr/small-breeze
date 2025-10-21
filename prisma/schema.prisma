@@ -17,10 +17,21 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
-  listings      Listing[]
   sessions      Session[]
+  teams         Team[]
 
   @@map("users")
+}
+
+model Team {
+  id            String    @id @default(uuid())
+  name          String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  members       User[]
+  listings      Listing[]
+
+  @@map("teams")
 }
 
 model Account {
@@ -76,11 +87,11 @@ model Listing {
   state          String
   zip            String
   country        String
+  teamId         String
+  team           Team           @relation(fields: [teamId], references: [id])
+  calendarLinks  CalendarLink[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
-  userId         String
-  calendarLinks  CalendarLink[]
-  user           User           @relation(fields: [userId], references: [id])
 
   @@map("listings")
 }
