@@ -13,12 +13,15 @@ import { Form } from "./ui/form";
 import { toast } from "sonner";
 import { signUpSchema } from "@/lib/validations";
 import authClient from "@/lib/auth-client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type UserAuthFormProps = React.HTMLAttributes<HTMLDivElement>;
 
 type FormData = z.infer<typeof signUpSchema>;
 
 export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
+  const router = useRouter();
   const form = useForm<FormData>({
     resolver: zodResolver(signUpSchema),
   });
@@ -37,7 +40,9 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
         firstName: data.firstName,
         lastName: data.lastName,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)
+      } as any, {
+        onSuccess: () => router.push("/verify-email")
+      })
 
       setIsLoading(false);
 
@@ -145,7 +150,9 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
                 type="button"
                 className={cn(buttonVariants(), "hover:cursor-pointer")}
                 disabled={isLoading}
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   const ok = await form.trigger(["firstName", "lastName", "email", "password"])
                   if (ok) setStep(2)
                 }}
@@ -154,7 +161,7 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
               </button>
             </div>
           ) : (
-              <div className="grid gap-2">
+            <div className="grid gap-2">
               <div className="grid gap-1">
                 <Label htmlFor="teamName">Team name</Label>
                 <Input
@@ -165,7 +172,6 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
                   autoComplete="organization"
                   autoCorrect="off"
                   disabled={isLoading}
-                  placeholder="e.g. SmallBreeze Inc."
                   {...form.register("teamName")}
                 />
                 {form.formState.errors?.teamName && (
@@ -174,22 +180,31 @@ export default function SignUpForm({ className, ...props }: UserAuthFormProps) {
                   </p>
                 )}
               </div>
-
-              <div className="flex items-center justify-between gap-2">
-                <button
-                  type="button"
-                  className={cn(buttonVariants({ variant: "outline" }))}
-                  disabled={isLoading}
-                  onClick={() => setStep(1)}
-                >
-                  Back
-                </button>
-                <button className={cn(buttonVariants(), "hover:cursor-pointer")} disabled={isLoading}>
-                  {isLoading && (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Create account
-                </button>
+              
+              <button type="submit" className={cn(buttonVariants(), "hover:cursor-pointer")} disabled={isLoading}>
+                {isLoading && (
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Create account
+              </button>
+              <div className="grid gap-1 mt-4">
+                <p className="px-8 text-center text-sm text-muted-foreground">
+                  By clicking continue, you agree to our{" "}
+                  <Link
+                    href="/terms"
+                    className="hover:text-brand underline underline-offset-4"
+                  >
+                    Terms of Service
+                  </Link>{" "}
+                    and{" "}
+                  <Link
+                    href="/privacy"
+                    className="hover:text-brand underline underline-offset-4"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </p>
               </div>
             </div>
           )}

@@ -4,6 +4,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 import SignUpForm from "@/components/sign-up-form"
 import { Suspense } from "react"
+import Logo from "@/components/logo"
 
 export const metadata = {
   title: "Create an account",
@@ -17,12 +18,12 @@ export default async function RegisterPage() {
       <Link
           href="/"
           className={cn(
-            buttonVariants({ variant: "ghost" }),
+            buttonVariants({ variant: "ghost", size: "icon" }),
             "absolute left-4 top-4 md:left-8 md:top-8"
           )}
         >
           <Icons.left className="h-4 w-4" />
-          Back
+          <span className="sr-only">Back</span>
         </Link>
         <Link
           href="/sign-in"
@@ -37,7 +38,8 @@ export default async function RegisterPage() {
       <div className="lg:p-8">
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
-            <Icons.logo className="mx-auto h-6 w-6" />
+            <Logo />
+
             <h1 className="text-2xl font-semibold tracking-tight">
               Create an account
             </h1>
@@ -48,23 +50,6 @@ export default async function RegisterPage() {
           <Suspense>
             <SignUpForm />
           </Suspense>
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            By clicking continue, you agree to our{" "}
-            <Link
-              href="/terms"
-              className="hover:text-brand underline underline-offset-4"
-            >
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link
-              href="/privacy"
-              className="hover:text-brand underline underline-offset-4"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </p>
         </div>
       </div>
     </div>
