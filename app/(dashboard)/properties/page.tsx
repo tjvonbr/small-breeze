@@ -4,11 +4,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import React from "react";
 import { redirect } from "next/navigation";
-import { getListingsByUserId } from "@/lib/listings";
+import { getListingsByTeamId } from "@/lib/listings";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import EmptyProperties from "@/components/empty-properties";
 import AddListingButton from "@/components/add-listing-button";
+import { getCurrentTeamIdFromCookies } from "@/lib/actions/teams";
+import { ensureUserHasTeam } from "@/lib/teams";
 
 function formatUpdatedAt(dateValue: Date | string) {
   const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
@@ -24,7 +26,10 @@ export default async function PropertiesPage() {
     redirect("/sign-in")
   }
 
-  const listings = await getListingsByUserId(session.user.id)
+  await ensureUserHasTeam(session.user.id, `${session.user.firstName} ${session.user.lastName}'s Team`)
+  const cookieTeamId = await getCurrentTeamIdFromCookies()
+  const effectiveTeamId = cookieTeamId ?? session.user.id
+  const listings = await getListingsByTeamId(effectiveTeamId)
 
   return (
     <DashboardShell>
