@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { newPropertySchema } from "../validations"
 import { headers } from "next/headers"
+import { getCurrentTeamIdFromCookies } from "../actions/teams"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createListing(_: any, formData: FormData) {
@@ -29,6 +30,8 @@ export async function createListing(_: any, formData: FormData) {
     iCalUrl: formData.get("iCalUrl"),
   })
 
+  const currentTeamId = await getCurrentTeamIdFromCookies() ?? session.user.id
+
   const newListing = await db.listing.create({
     data: {
       nickname: listing.nickname,
@@ -38,7 +41,7 @@ export async function createListing(_: any, formData: FormData) {
       state: listing.state,
       zip: listing.zip,
       country: listing.country,
-      teamId: session.user.id,
+      teamId: currentTeamId,
       ...(listing.iCalUrl && {
         calendarLinks: {
           create: {

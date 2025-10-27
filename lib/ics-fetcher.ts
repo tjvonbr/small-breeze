@@ -1,4 +1,5 @@
-import { parseICSFile, CalendarEvent } from './ics-parser';
+import { CalendarEvent } from './ics-parser';
+import { parseFiles } from './ics-parser';
 
 export async function fetchAndParseICS(url: string): Promise<CalendarEvent[]> {
   try {
@@ -8,7 +9,7 @@ export async function fetchAndParseICS(url: string): Promise<CalendarEvent[]> {
     }
     
     const icsContent = await response.text();
-    return parseICSFile(icsContent);
+    return parseFiles(icsContent);
   } catch (error) {
     console.error(`Error fetching ICS from ${url}:`, error);
     return [];
