@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import type { DayProps } from 'react-day-picker';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarEvent } from '@/lib/ics-parser';
 import DayCell from './day-cell';
@@ -19,9 +20,17 @@ export default function CalendarView({ events, showOnlyCheckoutDays = false }: C
         mode="single"
         selected={selectedDate}
         onSelect={setSelectedDate}
-        className="rounded-md [&_.rdp-table]:border-separate [&_.rdp-table]:border-spacing-2 [&_.rdp-tbody_td]:p-1"
+        className="rounded-md [&_.rdp-table]:border-collapse [&_td]:border [&_td]:border-border [&_td]:p-0"
         components={{
-          Day: (props) => <DayCell day={props.day.date} events={events} selectDate={setSelectedDate} showOnlyCheckoutDays={showOnlyCheckoutDays} />
+          Day: (props: DayProps) => (
+            <DayCell
+              day={props.day.date}
+              events={events}
+              selectDate={setSelectedDate}
+              showOnlyCheckoutDays={showOnlyCheckoutDays}
+              isOutsideMonth={props.modifiers?.outside ?? false}
+            />
+          )
         }}
       />
     </div>
