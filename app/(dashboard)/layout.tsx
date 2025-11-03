@@ -1,5 +1,4 @@
 import { DashboardNav } from "@/components/dashboard-nav"
-import { MainNav } from "@/components/main-nav"
 import { dashboardConfig } from "@/config/dashboard"
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth"

@@ -1,35 +1,26 @@
 import { CalendarEvent } from './ics-parser';
 import { parseFiles } from './ics-parser';
+import { CalendarLink, Listing } from '@/generated/prisma';
 
-export async function fetchAndParseICS(url: string): Promise<CalendarEvent[]> {
+type CalendarLinkWithListing = CalendarLink & { listing: Listing };
+
+export async function fetchAndParseICS(link: CalendarLinkWithListing): Promise<CalendarEvent[]> {
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ICS file: ${response.statusText}`);
-    }
-    
-    const icsContent = await response.text();
-    return parseFiles(icsContent);
+    return await parseFiles([link]);
   } catch (error) {
-    console.error(`Error fetching ICS from ${url}:`, error);
+    console.error(`Error parsing ICS from ${link.url}:`, error);
     return [];
   }
 }
 
-export async function fetchAllICSFiles(urls: string[]): Promise<CalendarEvent[]> {
-  const promises = urls.map(url => fetchAndParseICS(url));
-  const results = await Promise.allSettled(promises);
-  
-  const allEvents: CalendarEvent[] = [];
-  results.forEach((result, index) => {
-    if (result.status === 'fulfilled') {
-      allEvents.push(...result.value);
-    } else {
-      console.error(`Failed to fetch ICS from ${urls[index]}:`, result.reason);
-    }
-  });
-  
-  return allEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
+export async function fetchAllICSFiles(links: CalendarLinkWithListing[]): Promise<CalendarEvent[]> {
+  try {
+    // parseFiles already fetches and sorts events
+    return await parseFiles(links);
+  } catch (error) {
+    console.error('Failed to parse ICS files:', error);
+    return [];
+  }
 }
 
 export function getEventsForDate(events: CalendarEvent[], date: Date): CalendarEvent[] {
