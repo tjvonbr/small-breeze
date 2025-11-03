@@ -8,6 +8,7 @@ import { redirect } from "next/navigation"
 import { newPropertySchema } from "../validations"
 import { headers } from "next/headers"
 import { getCurrentTeamIdFromCookies } from "../actions/teams"
+import { ensureUserHasTeam } from "@/lib/teams"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createListing(_: any, formData: FormData) {
@@ -30,7 +31,36 @@ export async function createListing(_: any, formData: FormData) {
     iCalUrl: formData.get("iCalUrl"),
   })
 
-  const currentTeamId = await getCurrentTeamIdFromCookies() ?? session.user.id
+  const cookieTeamId = await getCurrentTeamIdFromCookies()
+
+  let currentTeamId: string | null = null
+
+  if (cookieTeamId) {
+    const team = await db.team.findFirst({
+      where: { id: cookieTeamId, members: { some: { id: session.user.id } } },
+      select: { id: true }
+    })
+    currentTeamId = team?.id ?? null
+  }
+
+  if (!currentTeamId) {
+    await ensureUserHasTeam(
+      session.user.id,
+      `${session.user.firstName} ${session.user.lastName}'s Team`
+    )
+
+    const teams = await db.team.findMany({
+      where: { members: { some: { id: session.user.id } } },
+      select: { id: true },
+      orderBy: { createdAt: "asc" }
+    })
+
+    currentTeamId = teams[0]?.id ?? null
+  }
+
+  if (!currentTeamId) {
+    return { error: "No team found for user" }
+  }
 
   const newListing = await db.listing.create({
     data: {
