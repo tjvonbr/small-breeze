@@ -6,12 +6,15 @@ import Link from "next/link"
 import { Icons } from "./icons"
 import { SidebarNavItem } from "@/config/dashboard"
 import { UserDropdown } from "./user-dropdown"
+import { TeamDropdown } from "./team-dropdown"
 
 interface DashboardNavProps {
   items?: SidebarNavItem[]
+  teams?: { id: string; name: string }[]
+  currentTeamId?: string | null
 }
 
-export function DashboardNav({ items }: DashboardNavProps) {
+export function DashboardNav({ items, teams = [], currentTeamId = null }: DashboardNavProps) {
   const path = usePathname()
 
   if (!items?.length) {
@@ -21,6 +24,7 @@ export function DashboardNav({ items }: DashboardNavProps) {
   return (
     <div className="pt-6 pb-2 flex flex-col h-full border-r">
       <nav className="grid items-start gap-2">
+          <TeamDropdown teams={teams} currentTeamId={currentTeamId} />
         {items.map((item, index) => {
           const Icon = Icons[item.icon as keyof typeof Icons || "arrowRight"]
           return (

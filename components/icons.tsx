@@ -1,4 +1,4 @@
-import { ArrowRight, BellRing, ChevronLeft, Earth, Home, Laptop, ListTodo, Moon, NotebookPen, Star, Sun, X, Loader2, Facebook, Mail, MessageSquareText, Magnet, Users, Wind, CalendarRange, House, Plus } from "lucide-react";
+import { ArrowRight, BellRing, ChevronLeft, Earth, Home, Laptop, ListTodo, Moon, NotebookPen, Star, Sun, X, Loader2, Facebook, Mail, MessageSquareText, Magnet, Users, Wind, CalendarRange, House, Plus, ChevronUp, ChevronDown } from "lucide-react";
 
 export const Icons = {
   alert: BellRing,
@@ -21,6 +21,8 @@ export const Icons = {
   spinner: Loader2,
   star: Star,
   sun: Sun,
+  down: ChevronDown,
+  up: ChevronUp,
   users: Users,
   plus: Plus,
 }
