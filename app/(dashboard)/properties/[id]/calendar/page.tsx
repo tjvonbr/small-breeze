@@ -9,7 +9,7 @@ interface PropertyCalendarPageProps {
 }
 
 export default async function PropertyCalendarPage({ params }: PropertyCalendarPageProps) {
-  const { id } = await params
+  const { id } = params
 
   const listing = await getListingById(id)
   const calendarLinks = await getCalendarLinksByListingId(id)
