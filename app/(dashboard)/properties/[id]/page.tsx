@@ -10,7 +10,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
 interface PropertyPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function PropertyPage({ params }: PropertyPageProps) {

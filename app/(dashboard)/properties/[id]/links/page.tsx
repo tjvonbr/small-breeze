@@ -5,7 +5,7 @@ import { getListingById } from "@/lib/listings";
 import ListingLinksPageOps from "@/components/listing-links-page";
 
 interface PropertyLinksPageProps {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export default async function PropertyLinksPage({ params }: PropertyLinksPageProps) {

@@ -1,32 +1,10 @@
 "use server"
 
-import { headers } from "next/headers";
-import { auth } from "../auth";
 import { cookies } from "next/headers";
 
 const CURRENT_TEAM_COOKIE = "sb_current_team";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function switchTeam(_: any, formData: FormData) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    return { error: "Unauthorized" };
-  }
-
-  const teamId = String(formData.get("teamId") || "").trim();
-  if (!teamId) {
-    return { error: "Missing teamId" };
-  }
-
-  // Optionally: verify membership here with a DB check
-  // e.g., await db.team.findFirst({ where: { id: teamId, members: { some: { id: session.user.id } } } })
-
-  setCurrentTeamIdCookie(teamId);
-  return { ok: true };
-}
+// switchTeam moved to app/actions/teams to run as a proper Server Action.
 
 export async function getCurrentTeamIdFromCookies(): Promise<string | null> {
   const jar = await cookies();
@@ -35,8 +13,8 @@ export async function getCurrentTeamIdFromCookies(): Promise<string | null> {
 }
 
 export async function setCurrentTeamIdCookie(teamId: string) {
-  const cookieStore = await cookies();
-  cookieStore.set(CURRENT_TEAM_COOKIE, teamId, {
+  const jar = await cookies();
+  jar.set(CURRENT_TEAM_COOKIE, teamId, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
