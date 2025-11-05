@@ -3,9 +3,9 @@ import db from "./prisma";
 export async function ensureUserHasTeam(userId: string, defaultTeamName: string) {
   const existingTeam = await db.team.findFirst({
     where: {
-      members: {
+      memberships: {
         some: {
-          id: userId,
+          userId,
         },
       },
     },
@@ -18,8 +18,8 @@ export async function ensureUserHasTeam(userId: string, defaultTeamName: string)
   const newTeam = await db.team.create({
     data: {
       name: defaultTeamName,
-      members: {
-        connect: { id: userId },
+      memberships: {
+        create: { userId, role: 'ADMIN' },
       },
     },
   });

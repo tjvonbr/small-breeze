@@ -37,7 +37,7 @@ export async function createListing(_: any, formData: FormData) {
 
   if (cookieTeamId) {
     const team = await db.team.findFirst({
-      where: { id: cookieTeamId, members: { some: { id: session.user.id } } },
+      where: { id: cookieTeamId, memberships: { some: { userId: session.user.id } } },
       select: { id: true }
     })
     currentTeamId = team?.id ?? null
@@ -50,7 +50,7 @@ export async function createListing(_: any, formData: FormData) {
     )
 
     const teams = await db.team.findMany({
-      where: { members: { some: { id: session.user.id } } },
+      where: { memberships: { some: { userId: session.user.id } } },
       select: { id: true },
       orderBy: { createdAt: "asc" }
     })
