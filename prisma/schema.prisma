@@ -8,17 +8,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TeamRole {
+  ADMIN
+  MEMBER
+}
+
 model User {
   id            String    @id @default(uuid())
   firstName     String
   lastName      String
   email         String    @unique
   emailVerified Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  teamMembers   TeamMember[]
   accounts      Account[]
   sessions      Session[]
-  teams         Team[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@map("users")
 }
@@ -28,10 +33,24 @@ model Team {
   name          String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  members       User[]
+  memberships   TeamMember[]
   listings      Listing[]
 
   @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  role      TeamRole @default(MEMBER)
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teamId, userId])
+  @@map("team_members")
 }
 
 model Account {

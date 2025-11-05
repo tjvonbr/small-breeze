@@ -22,7 +22,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     await ensureUserHasTeam(session.user.id, `${session.user.firstName} ${session.user.lastName}'s Team`)
 
     teams = await db.team.findMany({
-      where: { members: { some: { id: session.user.id } } },
+      where: { memberships: { some: { userId: session.user.id } } },
       select: { id: true, name: true },
       orderBy: { createdAt: "asc" },
     })
