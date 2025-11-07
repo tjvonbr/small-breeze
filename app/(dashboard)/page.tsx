@@ -1,8 +1,11 @@
 
-import CalendarView from '@/components/calendar-view';
+import HorizontalCalendar from '@/components/horizontal-calendar';
 import { auth } from '@/lib/auth';
 import { getCalendarLinksByTeamId } from '@/lib/calendar-links';
 import { getCurrentTeamIdFromCookies } from '@/lib/actions/teams';
+import { getListingsByTeamId } from '@/lib/listings';
+import { ensureUserHasTeam } from '@/lib/teams';
+import db from '@/lib/prisma';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -15,8 +18,23 @@ export default async function CalendarPage() {
     redirect("/sign-in")
   }
 
-  const teamId = await getCurrentTeamIdFromCookies()
-  const events = await getCalendarLinksByTeamId(teamId || session.user.id)
+  await ensureUserHasTeam(session.user.id, `${session.user.firstName} ${session.user.lastName}'s Team`)
+  const cookieTeamId = await getCurrentTeamIdFromCookies()
+  const teams = await db.team.findMany({
+    where: { memberships: { some: { userId: session.user.id } } },
+    select: { id: true },
+    orderBy: { createdAt: 'asc' },
+  })
+  const effectiveTeamId = cookieTeamId ?? (teams.length > 0 ? teams[0].id : null)
 
-  return <CalendarView events={events} showOnlyCheckoutDays={true} />;
+  if (!effectiveTeamId) {
+    redirect('/properties')
+  }
+
+  const [events, listings] = await Promise.all([
+    getCalendarLinksByTeamId(effectiveTeamId),
+    getListingsByTeamId(effectiveTeamId),
+  ])
+
+  return <HorizontalCalendar listings={listings} events={events} />
 }
