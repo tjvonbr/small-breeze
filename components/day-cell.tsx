@@ -29,6 +29,7 @@ export default function DayCell({ day, events, selectDate, showOnlyCheckoutDays 
     return isEventOnDay
   })
 
+  const isToday = isSameDay(date, new Date())
   const hasCheckinToday = events.some((e) => isSameDay(e.start, date))
   const hasCheckoutToday = events.some((e) => isSameDay(e.end, date))
   const hasTurnoverToday = hasCheckinToday && hasCheckoutToday
@@ -41,7 +42,9 @@ export default function DayCell({ day, events, selectDate, showOnlyCheckoutDays 
       )}
       onClick={() => selectDate(day)}
     >
-      <p className="text-sm absolute top-2 right-2 z-10">{date.getDate()}</p>
+      <div className={cn("w-6 h-6 rounded-full p-1 flex items-center justify-center", isToday ? "bg-primary" : "")}>
+        <p className={cn("text-sm", isToday && "text-white")}>{date.getDate()}</p>
+      </div>
       <div className="absolute inset-0 pointer-events-none">
         {eventsForDay.map((event) => (
           <BookingBar
