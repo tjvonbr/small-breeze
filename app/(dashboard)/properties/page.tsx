@@ -10,7 +10,6 @@ import { auth } from "@/lib/auth";
 import EmptyProperties from "@/components/empty-properties";
 import AddListingButton from "@/components/add-listing-button";
 import { getCurrentTeamIdFromCookies } from "@/lib/actions/teams";
-import { ensureUserHasTeam } from "@/lib/teams";
 
 function formatUpdatedAt(dateValue: Date | string) {
   const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
@@ -26,7 +25,6 @@ export default async function PropertiesPage() {
     redirect("/sign-in")
   }
 
-  await ensureUserHasTeam(session.user.id, `${session.user.firstName} ${session.user.lastName}'s Team`)
   const cookieTeamId = await getCurrentTeamIdFromCookies()
   const effectiveTeamId = cookieTeamId ?? session.user.id
   const listings = await getListingsByTeamId(effectiveTeamId)
