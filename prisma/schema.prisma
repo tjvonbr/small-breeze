@@ -35,7 +35,8 @@ model Team {
   updatedAt     DateTime  @updatedAt
   memberships   TeamMember[]
   listings      Listing[]
-
+  invites       Invite[]
+  
   @@map("teams")
 }
 
@@ -135,4 +136,17 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+model Invite {
+  id         String   @id @default(uuid())
+  email      String
+  teamId     String
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  acceptedAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+
+  @@map("invites")
 }

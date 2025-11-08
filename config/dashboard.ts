@@ -41,6 +41,11 @@ export const dashboardConfig: DashboardConfig = {
       title: "Properties",
       href: "/properties",
       icon: "house",
-    }
+    },
+    {
+      title: "Team",
+      href: "/team",
+      icon: "users",
+    },
   ],
 }
