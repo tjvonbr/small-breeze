@@ -1,0 +1,28 @@
+import { ArrowRight, BellRing, ChevronLeft, Earth, Home, Laptop, ListTodo, Moon, NotebookPen, Star, Sun, X, Loader2, Facebook, Mail, MessageSquareText, Magnet, Users, Wind, CalendarRange, House, Plus, ChevronUp, ChevronDown } from "lucide-react";
+
+export const Icons = {
+  alert: BellRing,
+  arrowRight: ArrowRight,
+  calendar: CalendarRange,
+  house: House,
+  earth: Earth,
+  frq: NotebookPen,
+  close: X,
+  choice: ListTodo,
+  facebook: Facebook,
+  home: Home,
+  laptop: Laptop,
+  lead: Magnet,
+  left: ChevronLeft,
+  logo: Wind,
+  mail: Mail,
+  messages: MessageSquareText,
+  moon: Moon,
+  spinner: Loader2,
+  star: Star,
+  sun: Sun,
+  down: ChevronDown,
+  up: ChevronUp,
+  users: Users,
+  plus: Plus,
+}
