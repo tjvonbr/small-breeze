@@ -42,11 +42,12 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { email } = inviteMemberSchema.parse(body);
+  const { email, role } = inviteMemberSchema.parse(body);
 
   const invite = await db.invite.create({
     data: {
       email,
+      role,
       team: {
         connect: {
           id: effectiveTeamId,

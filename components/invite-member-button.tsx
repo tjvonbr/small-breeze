@@ -5,13 +5,16 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "./ui/input";
 import { Icons } from "./icons";
 import { cn } from "@/lib/utils";
-import { Form } from "./ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { inviteMemberSchema } from "@/lib/validations";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { TeamRole } from "@/generated/prisma";
+import { Label } from "./ui/label";
 
 type InviteMemberFormProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -74,7 +77,8 @@ export default function InviteMemberButton({ className, ...props }: InviteMember
           <Form {...form}>
             <form id="invite-member-form" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="grid gap-4">
-                <div className="grid gap-1">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
@@ -91,6 +95,27 @@ export default function InviteMemberButton({ className, ...props }: InviteMember
                     </p>
                   )}
                 </div>
+                <FormField 
+                control={form.control} 
+                name="role" 
+                render={({ field}) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a role" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(TeamRole).map((role) => (
+                          <SelectItem key={role} value={role}>{role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <input type="hidden" name={field.name} value={field.value ?? ""} />
+                  </FormItem>
+              )} />
               </div>
             </form>
           </Form>

@@ -44,7 +44,7 @@ model TeamMember {
   id        String   @id @default(uuid())
   teamId    String
   userId    String
-  role      TeamRole @default(MEMBER)
+  role      TeamRole @default(ADMIN)
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -141,6 +141,7 @@ model Verification {
 model Invite {
   id         String   @id @default(uuid())
   email      String
+  role       TeamRole
   teamId     String
   team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   acceptedAt DateTime?

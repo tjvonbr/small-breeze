@@ -67,7 +67,6 @@ export default async function TeamsPage() {
       >
         <InviteMemberButton />
       </DashboardHeader>
-
       <div className="rounded-md mt-4 border">
         <Table>
           <TableHeader>
@@ -79,21 +78,21 @@ export default async function TeamsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {members.map((m) => (
-              <TableRow key={`member-${m.id}`}>
+            {members.map((member) => (
+              <TableRow key={`member-${member.id}`}>
                 <TableCell>
-                  {m.user.firstName} {m.user.lastName}
+                  {member.user.firstName} {member.user.lastName}
                 </TableCell>
-                <TableCell>{m.user.email}</TableCell>
-                <TableCell className="uppercase">{m.role.toLowerCase()}</TableCell>
+                <TableCell>{member.user.email}</TableCell>
+                <TableCell>{member.role.charAt(0).toUpperCase() + member.role.slice(1).toLowerCase()}</TableCell>
                 <TableCell>Member</TableCell>
               </TableRow>
             ))}
-            {invites.map((i) => (
-              <TableRow key={`invite-${i.id}`}>
+            {invites.map((invite) => (
+              <TableRow key={invite.id}>
                 <TableCell>-</TableCell>
-                <TableCell>{i.email}</TableCell>
-                <TableCell>Invited</TableCell>
+                <TableCell>{invite.email}</TableCell>
+                <TableCell>{invite.role.charAt(0).toUpperCase() + invite.role.slice(1).toLowerCase()}</TableCell>
                 <TableCell>Pending</TableCell>
               </TableRow>
             ))}

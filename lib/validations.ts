@@ -39,4 +39,5 @@ export const resetPasswordSchema = z.object({
 
 export const inviteMemberSchema = z.object({
   email: z.string().email(),
+  role: z.enum(["ADMIN", "MEMBER"]),
 });
