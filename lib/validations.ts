@@ -36,3 +36,7 @@ export const forgotPasswordSchema = z.object({
 export const resetPasswordSchema = z.object({
   password: z.string().min(1),
 });
+
+export const inviteMemberSchema = z.object({
+  email: z.string().email(),
+});
