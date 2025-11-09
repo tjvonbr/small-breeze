@@ -5,6 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { getCurrentTeamIdFromCookies } from "@/lib/actions/teams";
 import { ensureUserHasTeam } from "@/lib/teams";
+import resend from "@/lib/resend";
+import TeamInviteEmail from "@/components/emails/team-invite";
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({
@@ -51,6 +53,31 @@ export async function POST(req: NextRequest) {
         },
       },
     },
+  });
+
+  const team = await db.team.findUnique({
+    where: { id: effectiveTeamId },
+  });
+
+  if (!team) {
+    return NextResponse.json({ error: "Team not found." }, { status: 400 });
+  }
+
+  if (!invite) {
+    return NextResponse.json({ error: "Failed to create invite." }, { status: 400 });
+  }
+
+  await resend.emails.send({
+    from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+    to: email,
+    subject: `Join ${session.user.email} on Breezeway!`,
+    react: TeamInviteEmail({ 
+      invitedByFirstName: session.user.firstName, 
+      invitedByLastName: session.user.lastName, 
+      invitedByEmail: session.user.email, 
+      inviteLink: "localhost:3000",
+      teamName: team.name, 
+    }),
   });
 
   return NextResponse.json(invite);
