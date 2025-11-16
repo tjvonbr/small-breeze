@@ -6,6 +6,7 @@ import type { ListingWithCalendarLinks } from "@/types/listings"
 import type { CalendarEvent } from "@/lib/ics-parser"
 import BookingBar from "./booking-bar"
 import { isSameDay } from "@/lib/utils"
+import Link from "next/link"
 
 interface HorizontalCalendarProps {
   listings: ListingWithCalendarLinks[]
@@ -188,11 +189,20 @@ export default function HorizontalCalendar({
         <div className="flex">
           {/* Fixed nickname column (non-scrollable) */}
           <div className="shrink-0 sticky left-0 z-10 bg-background border-r w-56">
-            {listings.map((listing) => (
-              <div key={listing.id} className="h-12 border-b border-border px-3 flex items-center text-sm font-medium">
-                {listing.nickname}
-              </div>
-            ))}
+            {listings.map((listing) => {
+              const listingEvents = eventsByListing.get(listing.id) || []
+              // Next check-in should be the next future booking start, not the current stay
+              const nextFuture = listingEvents.find(e => startOfDayUtc(e.start).getTime() > today.getTime())
+              const nextCheckIn = nextFuture 
+                ? nextFuture.start.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })
+                : "None"
+              
+              return (
+                <div key={listing.id} className="h-20 flex flex-col border-b border-border px-3 py-2 justify-between text-sm font-medium">
+                  <Link href={`/properties/${listing.id}`} className="hover:underline">{listing.nickname}</Link>
+                  <div className="text-muted-foreground text-xs">{`Next check-in: ${nextCheckIn}`}</div>
+                </div>
+            )})}
           </div>
           {/* Scrollable day grid only */}
           <div ref={scrollRef} className="relative flex-1 overflow-x-auto overflow-y-hidden no-scrollbar">
@@ -223,7 +233,7 @@ export default function HorizontalCalendar({
                   const hasCheckoutOn = (date: Date) => listingEvents.some(e => isSameDay(e.end, date))
 
                   return (
-                    <div key={listing.id} className="relative h-12 border-b border-border odd:bg-muted/5">
+                    <div key={listing.id} className="relative h-20 border-b border-border odd:bg-muted/5">
                       <div className="relative h-full">
                         {listingEvents.map((evt) => {
                           const eventStartIdx = Math.max(0, daysBetween(startDate, evt.start))
