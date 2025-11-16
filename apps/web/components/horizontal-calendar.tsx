@@ -50,6 +50,7 @@ export default function HorizontalCalendar({
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const headerTrackRef = React.useRef<HTMLDivElement | null>(null)
   const [columnWidth, setColumnWidth] = React.useState(dayWidthPx)
+  const [showJumpToToday, setShowJumpToToday] = React.useState(false)
 
   const totalWidth = numDays * columnWidth
   const todayIndex = daysBetween(startDate, today)
@@ -75,6 +76,8 @@ export default function HorizontalCalendar({
       })
     }
     syncHeaderPosition(el.scrollLeft)
+    const todayLeft = todayIndex * columnWidth
+    setShowJumpToToday(Math.abs(el.scrollLeft - todayLeft) > threshold)
   }, [extendDaysOnScroll, columnWidth])
 
   React.useEffect(() => {
@@ -92,6 +95,9 @@ export default function HorizontalCalendar({
       const col = Math.max(24, Math.floor(width / 7))
       setColumnWidth(col)
       syncHeaderPosition(el.scrollLeft)
+      const todayLeft = todayIndex * col
+      const threshold = Math.max(200, col * 2)
+      setShowJumpToToday(Math.abs(el.scrollLeft - todayLeft) > threshold)
     }
     compute()
     const ro = new ResizeObserver(() => compute())
@@ -144,7 +150,7 @@ export default function HorizontalCalendar({
   }, [events])
 
   return (
-    <div ref={wrapperRef} className="h-full mt-4 flex flex-col border rounded-md p-4 overflow-hidden">
+    <div ref={wrapperRef} className="relative h-full mt-4 flex flex-col border rounded-md p-4 overflow-hidden">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background border-b">
         <div className="flex">
@@ -273,6 +279,25 @@ export default function HorizontalCalendar({
           </div>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={() => {
+          const scroller = scrollRef.current
+          if (!scroller) return
+          const target = todayIndex * columnWidth
+          scroller.scrollTo({ left: target, behavior: "smooth" })
+          requestAnimationFrame(() => syncHeaderPosition(target))
+        }}
+        className={cn(
+          "absolute bottom-4 right-4 rounded-full bg-primary text-white shadow-md px-3 py-2 text-xs transition-opacity hover:cursor-pointer",
+          showJumpToToday ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        aria-label="Scroll to today"
+        title="Scroll to today"
+      >
+        Jump to Today
+      </button>
     </div>
   )
 }
