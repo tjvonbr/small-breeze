@@ -153,7 +153,7 @@ export default function HorizontalCalendar({
             <div ref={headerTrackRef} className="relative will-change-transform" style={{ width: totalWidth }}>
               {/* Today line overlay */}
               {todayIndex >= 0 && todayIndex < numDays && (
-                <div className="absolute top-0 bottom-0 w-px bg-primary/70 z-20" style={{ left: todayIndex * columnWidth }} />
+                <div className="absolute top-0 bottom-0 w-px bg-primary/70 z-20" style={{ left: todayIndex * columnWidth + 0.5 }} />
               )}
               <div className="grid" style={{ gridTemplateColumns: `repeat(${numDays}, ${columnWidth}px)` }}>
                 {daysArray.map((d, i) => {
@@ -166,10 +166,13 @@ export default function HorizontalCalendar({
                   return (
                     <div key={i} className={cn("h-12 border-r border-border flex items-center justify-center text-xs text-muted-foreground relative",
                                                monthStart && "bg-muted/30",
-                                               isWeekend && "bg-muted/20")}
+                                               isWeekend && "bg-muted/20",
+                                               i === todayIndex - 1 && "border-r-0")}
                          title={d.toDateString()}>
                       <div className="flex flex-col items-center">
-                        <span className={cn("font-medium", isToday && "text-primary")}>{day}</span>
+                        <div className={cn("w-6 h-6 rounded-full p-1 flex items-center justify-center", isToday && "bg-primary")}>
+                          <span className={cn("font-medium", isToday && "text-white")}>{day}</span>
+                        </div>
                         <span>{weekday}</span>
                       </div>
                       {monthStart && (
@@ -213,13 +216,20 @@ export default function HorizontalCalendar({
                   {daysArray.map((d, i) => {
                     const isWeekend = d.getDay() === 0 || d.getDay() === 6
                     return (
-                      <div key={i} className={cn("border-r border-border", isWeekend && "bg-muted/10")} />
+                      <div
+                        key={i}
+                        className={cn(
+                          "border-r border-border",
+                          isWeekend && "bg-muted/10",
+                          i === todayIndex - 1 && "border-r-0"
+                        )}
+                      />
                     )
                   })}
                 </div>
                 {/* Today line overlay */}
                 {todayIndex >= 0 && todayIndex < numDays && (
-                  <div className="absolute top-0 bottom-0 w-0.5 bg-primary/70" style={{ left: todayIndex * columnWidth }} />
+                  <div className="absolute top-0 bottom-0 w-px bg-primary/70" style={{ left: todayIndex * columnWidth + 0.5 }} />
                 )}
               </div>
 
