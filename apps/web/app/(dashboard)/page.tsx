@@ -8,6 +8,9 @@ import { ensureUserHasTeam } from '@/lib/teams';
 import db from '@/lib/prisma';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { DashboardShell } from '@/components/dashboard-shell';
+import { DashboardHeader } from '@/components/dashboard-header';
+import EmptyProperties from '@/components/empty-properties';
 
 export default async function CalendarPage() {
   const session = await auth.api.getSession({
@@ -36,5 +39,16 @@ export default async function CalendarPage() {
     getListingsByTeamId(effectiveTeamId),
   ])
 
-  return <HorizontalCalendar listings={listings} events={events} />
+  return (
+    <DashboardShell>
+      <DashboardHeader heading="Calendar" text="View your upcoming bookings" />
+      {listings.length > 0 ? (
+          <HorizontalCalendar listings={listings} events={events} />
+      ) : (
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <EmptyProperties />
+        </div>
+      )}
+    </DashboardShell>
+  )
 }

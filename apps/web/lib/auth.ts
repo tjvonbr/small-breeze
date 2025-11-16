@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import db from "@/lib/prisma";
-import resend from "./resend";
+import { getResend } from "./resend";
 import VerifyEmail from "@/components/emails/verify-email";
 
 export const auth = betterAuth({
@@ -14,11 +14,16 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
-      resend.emails.send({
-          from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
-          to: user.email,
-          subject: "Verify your email",
-          react: VerifyEmail({ email: user.email, verifyUrl: url }),
+      const resend = getResend();
+      if (!resend) {
+        console.warn("RESEND_API_KEY missing; skipping verification email send at build/runtime.");
+        return;
+      }
+      await resend.emails.send({
+        from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+        to: user.email,
+        subject: "Verify your email",
+        react: VerifyEmail({ email: user.email, verifyUrl: url }),
       });
     },
   },

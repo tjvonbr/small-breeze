@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import db from "@/lib/prisma";
 import { getCurrentTeamIdFromCookies } from "@/lib/actions/teams";
 import { ensureUserHasTeam } from "@/lib/teams";
-import resend from "@/lib/resend";
+import { getResend } from "@/lib/resend";
 import TeamInviteEmail from "@/components/emails/team-invite";
 
 export async function POST(req: NextRequest) {
@@ -67,18 +67,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create invite." }, { status: 400 });
   }
 
-  await resend.emails.send({
-    from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
-    to: email,
-    subject: `Join ${session.user.email} on Breezeway!`,
-    react: TeamInviteEmail({ 
-      invitedByFirstName: session.user.firstName, 
-      invitedByLastName: session.user.lastName, 
-      invitedByEmail: session.user.email, 
-      inviteLink: "localhost:3000",
-      teamName: team.name, 
-    }),
-  });
+  const inviteLink = `${process.env.NEXT_PUBLIC_APP_URL}/sign-up?email=${email}&inviteId=${invite.id}`;
+
+  const resend = getResend();
+  if (resend) {
+    await resend.emails.send({
+      from: `${process.env.EMAIL_SENDER_NAME} <${process.env.EMAIL_SENDER_ADDRESS}>`,
+      to: email,
+      subject: `Join ${session.user.email} on Breezeway!`,
+      react: TeamInviteEmail({ 
+        invitedByFirstName: session.user.firstName, 
+        invitedByLastName: session.user.lastName, 
+        invitedByEmail: session.user.email, 
+        inviteLink,
+        teamName: team.name, 
+      }),
+    });
+  } else {
+    console.warn("RESEND_API_KEY missing; invite email not sent. Invite still created.", { inviteId: invite.id });
+  }
 
   return NextResponse.json(invite);
 }

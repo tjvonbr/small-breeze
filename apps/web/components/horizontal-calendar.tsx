@@ -41,6 +41,7 @@ export default function HorizontalCalendar({
   extendDaysOnScroll = 60,
   dayWidthPx = 40,
 }: HorizontalCalendarProps) {
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null)
   const today = startOfDayUtc(new Date())
   const initialPastDays = 21
   const [numDays, setNumDays] = React.useState(startDays)
@@ -106,6 +107,22 @@ export default function HorizontalCalendar({
     }
   }, [columnWidth, todayIndex])
 
+  // Route wheel events to horizontal scroll and prevent page scroll while hovering the calendar
+  React.useEffect(() => {
+    const wrapper = wrapperRef.current
+    const scroller = scrollRef.current
+    if (!wrapper || !scroller) return
+    const onWheel = (e: WheelEvent) => {
+      // Always handle wheel inside the calendar to avoid page scroll
+      e.preventDefault()
+      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX
+      scroller.scrollLeft += delta
+      syncHeaderPosition(scroller.scrollLeft)
+    }
+    wrapper.addEventListener('wheel', onWheel, { passive: false })
+    return () => wrapper.removeEventListener('wheel', onWheel as unknown as EventListener)
+  }, [columnWidth])
+
   const daysArray = React.useMemo(() => {
     return Array.from({ length: numDays }, (_, i) => addDays(startDate, i))
   }, [numDays, startDate])
@@ -126,7 +143,7 @@ export default function HorizontalCalendar({
   }, [events])
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div ref={wrapperRef} className="h-full mt-4 flex flex-col border rounded-md p-4 overflow-hidden">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-background border-b">
         <div className="flex">

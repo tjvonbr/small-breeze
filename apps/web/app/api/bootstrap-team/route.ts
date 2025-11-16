@@ -22,5 +22,3 @@ export async function GET(req: NextRequest) {
 
 	return NextResponse.redirect(new URL("/", req.url));
 }
-
-
