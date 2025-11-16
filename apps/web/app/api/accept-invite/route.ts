@@ -27,12 +27,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Ensure the invite email matches the authenticated user's email
   if (invite.email.toLowerCase() !== session.user.email.toLowerCase()) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Create membership if it doesn't exist already
   const existingMembership = await db.teamMember.findFirst({
     where: {
       teamId: invite.teamId,
@@ -50,7 +48,6 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Mark invite as accepted
   if (!invite.acceptedAt) {
     await db.invite.update({
       where: { id: invite.id },
@@ -58,7 +55,6 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  // Set cookie for current team and redirect to dashboard
   await setCurrentTeamIdCookie(invite.teamId);
 
   return NextResponse.redirect(new URL("/", req.url));
