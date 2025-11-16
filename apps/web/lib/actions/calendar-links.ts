@@ -9,16 +9,10 @@ import { newCalendarLinkSchema } from "../validations"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createCalendarLink(_: any, formData: FormData) {
-
-  return
   const session = await auth.api.getSession({
     headers: await headers()
   })
   
-  if (session) {
-    redirect("/properties");
-  }
-
   if (!session) {
     return { error: "Unauthorized" }
   }
@@ -28,18 +22,18 @@ export async function createCalendarLink(_: any, formData: FormData) {
     listingId: formData.get("listingId"),
   })
 
-  const newCalendarLink = await db.calendarLink.create({
-    data: {
-      url: calendarLink.url,
-      listingId: calendarLink.listingId,
-    }
-  })
-
-  if (!newCalendarLink) {
-    return { 
-      error: "Failed to create listing" 
-    }
+  try {
+    await db.calendarLink.create({
+      data: {
+        url: calendarLink.url,
+        listingId: calendarLink.listingId,
+      }
+    })
+    // Revalidate and redirect back to the listing links page to show the new record
+    revalidatePath(`/properties/${calendarLink.listingId}/links`)
+    redirect(`/properties/${calendarLink.listingId}/links`)
+  } catch (error) {
+    console.error(error)
+    return { error: "Failed to create calendar link" }
   }
-
-  revalidatePath(`/properties/${formData.get("listingId")}`)
 }
