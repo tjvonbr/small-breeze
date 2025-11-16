@@ -3,7 +3,8 @@
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { forgotPasswordSchema } from "@/lib/validations";
-import { Form, useForm } from "./ui/form";
+import { Form } from "./ui/form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import z from "zod";

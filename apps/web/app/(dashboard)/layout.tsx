@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/prisma"
 import { ensureUserHasTeam } from "@/lib/teams"
 import { getCurrentTeamIdFromCookies } from "@/lib/actions/teams"
+import { Toaster } from "@/components/ui/sonner"
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -42,6 +43,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
           />
         </aside>
         <main className="h-full flex flex-1 flex-col overflow-y-auto px-8">
+          <Toaster />
           {children}
         </main>
       </div>
